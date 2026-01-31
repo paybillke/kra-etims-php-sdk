@@ -14,10 +14,8 @@ return [
         'sbx' => [
             // 🔑 TRIMMED URL (NO trailing spaces - critical fix!)
             'token_url'      => trim('https://sbx.kra.go.ke/v1/token/generate'),
-            'consumer_key'    => 'GBbvYDsp7t1NsejQsZg2s1w7XIfssXlJtwN1GT5IeinbKGE3',
-            'consumer_secret'=> 'wEME63ieCYnaGHeAzLQyGmYYxuNNd5xDDGEM9gdxjFZIyQcUB72RYmFfIyQZcMft'
-            // 'consumer_key'   => 'YOUR_SANDBOX_CONSUMER_KEY',      // 🔑 REPLACE
-            // 'consumer_secret'=> 'YOUR_SANDBOX_CONSUMER_SECRET',   // 🔑 REPLACE
+            'consumer_key'   => 'YOUR_SANDBOX_CONSUMER_KEY',      // 🔑 REPLACE
+            'consumer_secret'=> 'YOUR_SANDBOX_CONSUMER_SECRET',   // 🔑 REPLACE
         ],
         'prod' => [
             'token_url'      => trim('https://kra.go.ke/v1/token/generate'),
