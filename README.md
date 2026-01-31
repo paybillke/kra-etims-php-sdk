@@ -751,7 +751,7 @@ KRA mandates successful completion of automated tests before verification:
 | SLA execution queries | `timsupport@kra.go.ke` | 3-5 business days |
 
 ### SDK Support
-- **GitHub Issues**: [github.com/paybilldev/kra-etims-sdk/issues](https://github.com/paybilldev/kra-etims-sdk/issues)
+- **GitHub Issues**: [github.com/paybillke/kra-etims-php-sdk/issues](https://github.com/paybillke/kra-etims-php-sdk/issues)
 - **Email**: ebartile@gmail.com (for integration guidance)
 - **Emergency Hotline**: +254757807150 (business hours only)
 
