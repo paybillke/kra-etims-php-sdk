@@ -14,8 +14,10 @@ return [
         'sbx' => [
             // 🔑 TRIMMED URL (NO trailing spaces - critical fix!)
             'token_url'      => trim('https://sbx.kra.go.ke/v1/token/generate'),
-            'consumer_key'   => 'YOUR_SANDBOX_CONSUMER_KEY',      // 🔑 REPLACE
-            'consumer_secret'=> 'YOUR_SANDBOX_CONSUMER_SECRET',   // 🔑 REPLACE
+            'consumer_key'    => 'GBbvYDsp7t1NsejQsZg2s1w7XIfssXlJtwN1GT5IeinbKGE3',
+            'consumer_secret'=> 'wEME63ieCYnaGHeAzLQyGmYYxuNNd5xDDGEM9gdxjFZIyQcUB72RYmFfIyQZcMft'
+            // 'consumer_key'   => 'YOUR_SANDBOX_CONSUMER_KEY',      // 🔑 REPLACE
+            // 'consumer_secret'=> 'YOUR_SANDBOX_CONSUMER_SECRET',   // 🔑 REPLACE
         ],
         'prod' => [
             'token_url'      => trim('https://kra.go.ke/v1/token/generate'),
@@ -26,13 +28,10 @@ return [
 
     'api' => [
         'sbx' => [
-            // 🔑 TRIMMED URL + APigee App ID (REQUIRED for ALL requests)
             'base_url'      => trim('https://sbx.kra.go.ke/etims-oscu/api/v1'),
-            'apigee_app_id' => trim(getenv('KRA_APIGEE_APP_ID') ?: '3e18e00d-2f0e-4e93-9411-b698199683c5'),
         ],
         'prod' => [
             'base_url'      => trim('https://kra.go.ke/etims-oscu/api/v1'),
-            'apigee_app_id' => trim(getenv('KRA_PROD_APIGEE_APP_ID') ?: 'YOUR_PROD_APIGEE_APP_ID'),
         ],
     ],
 

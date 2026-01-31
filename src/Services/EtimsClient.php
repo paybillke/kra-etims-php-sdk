@@ -27,7 +27,7 @@ class EtimsClient extends BaseClient
         $validated = $this->validate($data, 'initialization');
         
         // Uses BaseClient::post() which now handles:
-        // - Correct headers (ONLY apigee_app_id + auth)
+        // - Correct headers (ONLY auth)
         // - Token refresh on 401
         // - KRA error unwrapping
         return $this->post('initialize', $validated);

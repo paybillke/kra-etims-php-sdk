@@ -8,7 +8,7 @@
 
 A production-ready PHP SDK for integrating with the Kenya Revenue Authority (KRA) **eTIMS OSCU** (Online Sales Control Unit) API. Built to match the official Postman collection specifications with strict header compliance, token management, and comprehensive validation.
 
-> ⚠️ **Critical Note**: This SDK implements the **new OSCU specification** (KRA-hosted), *not* the legacy eTIMS API. OSCU requires device registration, `apigee_app_id` headers, and `cmcKey` lifecycle management.
+> ⚠️ **Critical Note**: This SDK implements the **new OSCU specification** (KRA-hosted), *not* the legacy eTIMS API. OSCU requires device registration, headers, and `cmcKey` lifecycle management.
 
 ## Author
 
@@ -44,7 +44,6 @@ A production-ready PHP SDK for integrating with the Kenya Revenue Authority (KRA
 KRA's **Electronic Tax Invoice Management System (eTIMS)** uses **OSCU** (Online Sales Control Unit) – a KRA-hosted software module that validates and signs tax invoices in real-time before issuance. Unlike legacy systems, OSCU requires:
 
 - Pre-registered device serial numbers (`dvcSrlNo`)
-- APigee-based authentication (`apigee_app_id` header)
 - Communication key (`cmcKey`) lifecycle management
 - Strict payload schema compliance per KRA specifications
 
@@ -54,7 +53,7 @@ KRA's **Electronic Tax Invoice Management System (eTIMS)** uses **OSCU** (Online
 |---------|-----------------|--------------|
 | **Hosting** | KRA-hosted (cloud) | Self-hosted (on-premise) |
 | **Device Registration** | Mandatory pre-registration | Not required |
-| **Authentication** | Bearer token + `apigee_app_id` | Basic auth only |
+| **Authentication** | Bearer token | Basic auth only |
 | **Communication Key** | `cmcKey` required after init | Not applicable |
 | **API Base URL** | `sbx.kra.go.ke/etims-oscu/api/v1` | `etims-api-sbx.kra.go.ke` |
 | **Header Requirements** | Strict 6-header compliance | Minimal headers |
@@ -113,7 +112,6 @@ flowchart TD
 - Create application on [GavaConnect Developer Portal](https://developer.go.ke)
 - Obtain sandbox credentials:
   - Consumer Key/Secret (for token generation)
-  - APigee App ID (`apigee_app_id` - required in ALL requests)
   - Approved device serial number (`dvcSrlNo`)
 
 ### Phase 3: Automated App Testing
@@ -165,13 +163,7 @@ Before integration, you **MUST** complete these prerequisites:
 - Obtain **approved device serial number** (`dvcSrlNo`)
 - ⚠️ **Dynamic/unregistered device serials fail with `resultCd: 901`** ("It is not valid device")
 
-### 2. APigee Credentials (NON-NEGOTIABLE)
-- Request `apigee_app_id` from KRA support (`timsupport@kra.go.ke`)
-- Required in **ALL requests** (including initialization)
-- Sandbox format: `sbx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-- Production format: `prod-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-
-### 3. Communication Key Lifecycle
+### 2. Communication Key Lifecycle
 ```php
 // 1. Initialize FIRST (returns cmcKey)
 $response = $client->initialize([
@@ -218,8 +210,8 @@ $client->selectCodeList([...]);
 ✅ **Strict Header Management**  
 | Endpoint Type | Required Headers | Initialization Exception |
 |---------------|------------------|--------------------------|
-| **Initialization** | `Authorization`, `apigee_app_id` | ❌ NO `tin`/`bhfId`/`cmcKey` |
-| **All Other Endpoints** | `Authorization`, `apigee_app_id`, `tin`, `bhfId`, `cmcKey` | ✅ Full header set |
+| **Initialization** | `Authorization` | ❌ NO `tin`/`bhfId`/`cmcKey` |
+| **All Other Endpoints** | `Authorization`, `tin`, `bhfId`, `cmcKey` | ✅ Full header set |
 
 ✅ **Token Lifecycle Management**  
 - Automatic token caching with 60-second buffer  
@@ -281,11 +273,9 @@ return [
     'api' => [
         'sbx' => [
             'base_url'      => 'https://sbx.kra.go.ke/etims-oscu/api/v1',
-            'apigee_app_id' => getenv('KRA_APIGEE_APP_ID'), // 🔑 CRITICAL
         ],
         'prod' => [
             'base_url'      => 'https://api.developer.go.ke/etims-oscu/api/v1', // Production URL
-            'apigee_app_id' => getenv('KRA_PROD_APIGEE_APP_ID'),
         ],
     ],
 
@@ -626,8 +616,7 @@ try {
 | `503` | "Data not found" | Verify TIN/branch/item exists in KRA system |
 | `504` | "Duplicate data" | Use unique invoice number |
 | `505` | "Data relationship error" | Check parent-child relationships (e.g., item composition) |
-| `401` | "Unauthorized" | Check token validity + apigee_app_id header |
-| `403` | "Forbidden" | Verify APigee app permissions |
+| `401` | "Unauthorized" | Check token validity header |
 | `429` | "Rate limit exceeded" | Implement request throttling (max 100 req/min) |
 
 ---
@@ -651,18 +640,6 @@ try {
 // After initialization:
 $config['oscu']['cmc_key'] = $response['cmcKey'];
 $client = new EtimsClient($config, $auth); // MUST recreate client
-```
-
-### ❌ Missing apigee_app_id header
-
-**Cause**: `apigee_app_id` not set in config  
-**Solution**:
-```php
-'api' => [
-    'sbx' => [
-        'apigee_app_id' => 'sbx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', // 🔑 REQUIRED
-    ],
-],
 ```
 
 ### ❌ Trailing spaces in URLs
@@ -747,7 +724,6 @@ KRA mandates successful completion of automated tests before verification:
    `"SLA Execution with KRA - [Your Company Name]"`
 4. Await KRA approval (5-7 business days)
 5. Receive production keys via Developer Portal:
-   - Production `apigee_app_id`
    - Production consumer key/secret
 6. Deploy to production environment (`api.developer.go.ke`)
 7. Monitor compliance for first 30 days (KRA conducts spot checks)

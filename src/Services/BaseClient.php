@@ -105,37 +105,30 @@ abstract class BaseClient
     }
 
     /**
-     * Build headers with APigee compliance and endpoint-specific logic
+     * Build headers with endpoint-specific logic
      * @param string $endpoint Full endpoint path (e.g., '/initialize')
      */
     protected function buildHeaders(string $endpoint): array
     {
         $env = $this->config['env'];
-        $apigeeAppId = $this->config['api'][$env]['apigee_app_id'] ?? '';
-        
-        if (empty($apigeeAppId)) {
-            throw new ApiException('Missing required config: api.' . $env . '.apigee_app_id', 500);
-        }
 
-        // 🚨 INITIALIZATION EXCEPTION: Only apigee_app_id + auth headers
+        // 🚨 INITIALIZATION EXCEPTION: Only auth headers
         if (str_ends_with($endpoint, '/initialize')) {
             return [
                 'Authorization: Bearer ' . $this->auth->token(),
                 'Content-Type: application/json',
                 'Accept: application/json',
-                'apigee_app_id: ' . $apigeeAppId,
             ];
         }
 
-        // ✅ ALL OTHER ENDPOINTS: Full business headers + apigee_app_id
+        // ✅ ALL OTHER ENDPOINTS: Full business headers
         return [
             'Authorization: Bearer ' . $this->auth->token(),
             'Content-Type: application/json',
             'Accept: application/json',
             'tin: '    . ($this->config['oscu']['tin'] ?? ''),
             'bhfId: '  . ($this->config['oscu']['bhf_id'] ?? ''),
-            'cmcKey: ' . ($this->config['oscu']['cmc_key'] ?? ''),
-            'apigee_app_id: ' . $apigeeAppId,
+            'cmcKey: ' . ($this->config['oscu']['cmc_key'] ?? '')
         ];
     }
 

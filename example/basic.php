@@ -17,12 +17,11 @@ use KraEtimsSdk\Exceptions\ValidationException;
 // 1. Obtain SANDBOX credentials from KRA:
 //    • Email: timsupport@kra.go.ke
 //    • Subject: "Request for OSCU Sandbox Test Credentials"
-//    • Required: Approved device serial (dvcSrlNo), TIN, branch ID, APigee App ID
+//    • Required: Approved device serial (dvcSrlNo), TIN, branch ID
 //
 // 2. SET CREDENTIALS VIA ENVIRONMENT VARIABLES (SECURE):
 //    export KRA_CONSUMER_KEY="your_key"
 //    export KRA_CONSUMER_SECRET="your_secret"
-//    export KRA_APIGEE_APP_ID="your_apigee_id"
 //
 // 3. ⚠️ DEVICE SERIAL MUST BE PRE-REGISTERED WITH KRA
 //    • Sandbox test value (MAY work): dvcv1130
@@ -48,19 +47,16 @@ $config = [
         'prod' => [
             'token_url'      => trim('https://kra.go.ke/v1/token/generate'),
             'consumer_key'   => trim(getenv('KRA_PROD_CONSUMER_KEY') ?: 'YOUR_PROD_CONSUMER_KEY'),
-            'consumer_secret'=> trim(getenv('KRA_PROD_CONSUMER_SECRET') ?: 'YOUR_PROD_CONSUMER_SECRET'),
+            'consumer_secrzet'=> trim(getenv('KRA_PROD_CONSUMER_SECRET') ?: 'YOUR_PROD_CONSUMER_SECRET'),
         ],
     ],
 
     'api' => [
         'sbx' => [
-            // 🔑 TRIMMED URL + APigee App ID (REQUIRED for ALL requests)
             'base_url'      => trim('https://sbx.kra.go.ke/etims-oscu/api/v1'),
-            'apigee_app_id' => trim(getenv('KRA_APIGEE_APP_ID') ?: '3e18e00d-2f0e-4e93-9411-b698199683c5'),
         ],
         'prod' => [
             'base_url'      => trim('https://kra.go.ke/etims-oscu/api/v1'),
-            'apigee_app_id' => trim(getenv('KRA_PROD_APIGEE_APP_ID') ?: 'YOUR_PROD_APIGEE_APP_ID'),
         ],
     ],
 
@@ -69,7 +65,7 @@ $config = [
     ],
 
     'oscu' => [
-        'tin'     => trim(getenv('KRA_TIN') ?: 'P051092286D'),    // Sandbox test TIN
+        'tin'     => trim(getenv('KRA_TIN') ?: 'P000000002'),    // Sandbox test TIN
         'bhf_id'  => trim(getenv('KRA_BHF_ID') ?: '00'),          // Sandbox test branch
         'cmc_key' => '',                                           // Set AFTER initialization
     ],
@@ -132,9 +128,6 @@ function validateConfig(array $config): void
     if (strpos($sbx['consumer_secret'], 'YOUR_') !== false) {
         $missing[] = 'KRA_CONSUMER_SECRET (set via env var or config)';
     }
-    if (strpos($config['api']['sbx']['apigee_app_id'], 'YOUR_') !== false) {
-        $missing[] = 'KRA_APIGEE_APP_ID (set via env var or config - REQUIRED FOR ALL REQUESTS)';
-    }
     
     if ($missing) {
         echo "\n❌ MISSING CREDENTIALS:\n";
@@ -144,7 +137,6 @@ function validateConfig(array $config): void
         echo "\n💡 SET VIA ENVIRONMENT VARIABLES:\n";
         echo "   export KRA_CONSUMER_KEY='your_key'\n";
         echo "   export KRA_CONSUMER_SECRET='your_secret'\n";
-        echo "   export KRA_APIGEE_APP_ID='your_apigee_id'\n";
         echo "\n⚠️  DEVICE SERIAL WARNING:\n";
         echo "   You MUST use a KRA-approved device serial number.\n";
         echo "   Common sandbox test value: 'dvcv1130' (may work if pre-provisioned)\n";
@@ -228,14 +220,13 @@ printWarning('⚠️  Using unregistered device = resultCd 901 "not valid device
 
 // 🔑 USE STATIC, PRE-APPROVED DEVICE SERIAL (NOT DYNAMIC!)
 // Common sandbox test value (MAY work if KRA pre-provisioned it):
-$approvedDeviceSerial = 'dvcv1130'; // ⚠️ REPLACE WITH YOUR KRA-APPROVED SERIAL
+$approvedDeviceSerial = '3i7oBokRdPHqbHfzqYBm2Gg65g"'; // ⚠️ REPLACE WITH YOUR KRA-APPROVED SERIAL
 
 try {
     echo "Initializing with:\n";
     echo "  TIN: {$config['oscu']['tin']}\n";
     echo "  Branch ID: {$config['oscu']['bhf_id']}\n";
     echo "  Device Serial: $approvedDeviceSerial\n";
-    echo "  Headers: ONLY apigee_app_id + Bearer token (NO tin/bhfId/cmcKey)\n\n";
 
     $response = $etims->initialize([
         'tin'      => $config['oscu']['tin'],
@@ -497,9 +488,7 @@ echo "  4. ✅ Use SEQUENTIAL INTEGER invoice numbers (not strings with prefixes
 echo "  5. ✅ Ensure lastReqDt is NEVER in the future\n";
 echo "\n";
 echo "CRITICAL REMINDERS:\n";
-echo "  • apigee_app_id header is REQUIRED for ALL requests\n";
-echo "  • Initialization uses ONLY apigee_app_id header (NO tin/bhfId/cmcKey)\n";
-echo "  • All other endpoints require FULL headers (tin, bhfId, cmcKey, apigee_app_id)\n";
+echo "  • All other endpoints require FULL headers (tin, bhfId, cmcKey)\n";
 echo "  • Device serial registration is MANDATORY (infrastructure-level check)\n";
 echo "  • Invoice numbers must be UNIQUE per branch\n";
 echo "  • Date formats: YYYYMMDD (salesDt) / YYYYMMDDHHmmss (cfmDt, lastReqDt)\n";
