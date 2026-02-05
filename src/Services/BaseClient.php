@@ -188,7 +188,7 @@ abstract class BaseClient
         $body = $response['body'];
         $status = $response['status'];
         // KRA business error
-        if (!empty($body['resultCd']) && $body['resultCd'] !== '0000') {
+        if (!empty($body['resultCd']) && $body['resultCd'] !== '000') {
             throw new ApiException(
                 $body['resultMsg'] ?? 'KRA business error',
                 400,
